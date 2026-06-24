@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catapult Bot - AI Document Assistant</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='agent.png') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <img src="{{ url_for('static', filename='agent.png') }}?v=2" alt="Catapult Bot" onerror="this.style.display='none'; this.nextElementSibling.textContent='🤖 Catapult Bot'">
+                <span>Catapult Bot</span>
+            </div>
+        </div>
+
+        <div class="sidebar-content">
+            <!-- Documents Section -->
+            <div class="sidebar-section">
+                <div class="collapsible-section">
+                    <div class="collapsible-header" onclick="toggleCollapsible('documentsContent')">
+                        <span>📚 Documents</span>
+                        <span class="collapsible-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content" id="documentsContent">
+                        <div id="documentList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Info Section -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">System Status</div>
+                <div class="system-info" id="systemInfo">
+                    Loading...
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">User</div>
+                    <div class="user-role" id="userRole">Loading...</div>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">
+                🚪 Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <button class="hamburger-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+                ☰
+            </button>
+
+            <div class="mode-selector">
+                <button class="mode-selector-btn" id="modeSelectorBtn" onclick="toggleModeDropdown()">
+                    🌐 General + Docs <span style="margin-left: 0.3rem;">▼</span>
+                </button>
+                <div class="mode-dropdown">
+                    <div class="mode-option active" data-mode="general_plus_docs">
+                        <div class="mode-option-title">
+                            <span>🌐</span>
+                            <span>General + Docs</span>
+                        </div>
+                        <div class="mode-option-desc">Use AI knowledge + your documents</div>
+                    </div>
+                    <div class="mode-option" data-mode="documents_only">
+                        <div class="mode-option-title">
+                            <span>📚</span>
+                            <span>Only Documents</span>
+                        </div>
+                        <div class="mode-option-desc">Search only in your accessible documents</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="help-icon-btn" onclick="toggleHelpModal()" title="Help">
+                ?
+            </button>
+        </header>
+
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be added here dynamically -->
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        class="chat-input" 
+                        placeholder="Ask Catapult anything..." 
+                        rows="1"
+                        disabled
+                    ></textarea>
+                    <div class="chat-actions">
+                        <button id="sendBtn" class="chat-btn send-btn" disabled title="Send">
+                            <span id="sendIcon">➤</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Help Modal -->
+    <div class="help-modal" onclick="closeHelpModalOnOutsideClick(event)">
+        <div class="help-modal-content" onclick="event.stopPropagation()">
+            <div class="help-modal-header">
+                <h3>📖 How to Use Catapult Bot</h3>
+                <button class="help-modal-close" onclick="toggleHelpModal()">×</button>
+            </div>
+            <div class="help-modal-body">
+                <h4>🚀 Getting Started</h4>
+                <p>Catapult Bot is your intelligent document analysis assistant. Here's how to make the most of it:</p>
+                
+                <h4>🔍 Search Modes</h4>
+                <ul>
+                    <li><strong>General + Docs (Default):</strong> The bot can answer both general questions and questions about your documents</li>
+                    <li><strong>Only Documents:</strong> The bot will only answer based on your loaded documents</li>
+                </ul>
+
+                <h4>📚 Working with Documents</h4>
+                <ul>
+                    <li>All accessible documents are <strong>automatically loaded</strong> for you</li>
+                    <li>Click on the <strong>Documents section</strong> to view and manage your document selection</li>
+                    <li>Only documents you have <strong>permission to access</strong> will be shown</li>
+                    <li>Selected documents will be highlighted</li>
+                </ul>
+
+                <h4>💬 Asking Questions</h4>
+                <ul>
+                    <li>Type your question in the chat box at the bottom</li>
+                    <li>Press <strong>Enter</strong> or click the send button</li>
+                    <li>Ask follow-up questions - the bot remembers context!</li>
+                    <li>Use the <strong>Stop button</strong> to halt response generation</li>
+                </ul>
+
+                <h4>✨ Key Features</h4>
+                <ul>
+                    <li><strong>Role-Based Access:</strong> Secure document access based on your designation</li>
+                    <li><strong>Table Analysis:</strong> Extract and analyze data from tables</li>
+                    <li><strong>Image Processing:</strong> OCR and content analysis from images</li>
+                    <li><strong>Context Awareness:</strong> Maintains conversation history</li>
+                    <li><strong>Real-time Streaming:</strong> See responses as they're generated</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+</body>
+</html>

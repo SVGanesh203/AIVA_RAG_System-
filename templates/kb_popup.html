@@ -1,0 +1,62 @@
+<div id="kbBotPanel" class="kb-panel">
+    <!-- KB Bot Header -->
+    <div class="kb-panel-header">
+        <!-- Left: Title -->
+        <div class="kb-panel-title">KB Bot</div>
+
+        <!-- Middle: Mode selector (same structure as old page) -->
+        <div class="mode-selector" id="modeSelector">
+            <button class="mode-selector-btn" id="modeSelectorBtn" onclick="toggleModeDropdown()">
+                🌐 General + Docs <span style="margin-left: 0.3rem;">▼</span>
+            </button>
+            <div class="mode-dropdown" id="modeDropdown">
+                <div class="mode-option active" data-mode="general_plus_docs">
+                    <div class="mode-option-title">
+                        <span>🌐</span>
+                        <span>General + Docs</span>
+                    </div>
+                    <div class="mode-option-desc">Use AI knowledge + your documents</div>
+                </div>
+                <div class="mode-option" data-mode="documents_only">
+                    <div class="mode-option-title">
+                        <span>📚</span>
+                        <span>Only Documents</span>
+                    </div>
+                    <div class="mode-option-desc">Search only in your accessible documents</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Close button -->
+        <button class="kb-panel-close-btn" onclick="closeKbBot()" title="Close">
+            ✕
+        </button>
+    </div>
+
+    <!-- KB Bot Body: full chat UI lives here -->
+    <div class="kb-panel-body">
+        <div class="chat-container">
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be added here dynamically by chatbot.js -->
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea
+                        id="messageInput"
+                        class="chat-input"
+                        placeholder="Ask KB Bot anything..."
+                        rows="1"
+                    ></textarea>
+                    <div class="chat-actions">
+                        <button id="sendBtn" class="chat-btn send-btn" title="Send">
+                            <span id="sendIcon">➤</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

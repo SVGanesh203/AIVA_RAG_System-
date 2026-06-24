@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KB Bot</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='agent.png') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+</head>
+
+<body>
+
+    <!-- Top Header -->
+    <header class="top-header">
+        <!-- Search Icon on the RIGHT -->
+        <button class="search-icon-btn" onclick="openKbBot()" title="KB Bot">
+            🔍
+        </button>
+    </header>
+
+    <!-- Include the Messenger-style KB Bot popup -->
+    {% include 'kb_popup.html' %}
+
+    <!-- Your existing chatbot logic -->
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+
+    <!-- Open/close handlers for KB Bot panel -->
+    <script>
+        function openKbBot() {
+            const panel = document.getElementById('kbBotPanel');
+            if (panel) {
+                panel.classList.add('open'); // .kb-panel.open => display: flex
+            }
+        }
+
+        function closeKbBot() {
+            const panel = document.getElementById('kbBotPanel');
+            if (panel) {
+                panel.classList.remove('open');
+            }
+
+            if (window.chatbotApp && typeof window.chatbotApp.resetSession === 'function') {
+                window.chatbotApp.resetSession();
+            }
+        }
+
+    </script>
+
+</body>
+
+</body>
+
+</html>
