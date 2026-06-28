@@ -1,4 +1,4 @@
-# KB-Bot: RAG System with HuggingFace Embeddings & Ollama LLM
+# RAG System with HuggingFace Embeddings & Ollama LLM
 
 A comprehensive Knowledge Base Bot that leverages RAG (Retrieval Augmented Generation) with HuggingFace embeddings and Ollama local LLM for intelligent document search and Q&A.
 
@@ -17,7 +17,7 @@ A comprehensive Knowledge Base Bot that leverages RAG (Retrieval Augmented Gener
 ### Core Components
 
 ```
-KB-Bot/
+Aiva-bot/
 ├── app.py                          # Flask application entry point
 ├── config.py                       # Configuration & dependencies
 ├── rag_system.py                  # RAG query interface & context management
