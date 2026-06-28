@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KB Bot - Login</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='agent.png') }}?v=2">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f3f4f6;
+            /* light app background */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        }
+
+        .login-container h1 {
+            color: #111827;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .designation-select {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #111827;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .designation-select option {
+            background: #ffffff;
+            color: #111827;
+        }
+
+        .designation-select:focus {
+            border-color: #07ed41;
+            box-shadow: 0 0 0 2px rgba(7, 237, 65, 0.25);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: #07ed41;
+            /* primary */
+            color: #000000;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            margin-bottom: 1rem;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(7, 237, 65, 0.25);
+            background: #06c537;
+            /* slightly darker on hover */
+        }
+
+        .login-btn:disabled {
+            background: #e5e7eb;
+            cursor: not-allowed;
+            transform: none;
+            color: #9ca3af;
+            box-shadow: none;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #b91c1c;
+            padding: 0.9rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+            margin-bottom: 1rem;
+            display: none;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .success-message {
+            background: #ecfdf3;
+            color: #166534;
+            padding: 0.9rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+            margin-bottom: 1rem;
+            display: none;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .access-preview {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: left;
+            display: none;
+            border: 1px solid #e5e7eb;
+        }
+
+        .access-preview h3 {
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .access-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .access-item {
+            background: #07ed41;
+            color: #064e1a;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .no-access {
+            color: #6b7280;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div style="position: absolute; top: 20px; right: 20px;">
+            <button onclick="openEmbedModal()"
+                style="background:none; border:none; font-size: 1.1rem; cursor: pointer; color: #374151; font-weight: 600;">
+                ➕ Embed
+            </button>
+        </div>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='agent.png') }}?v=2" alt="KB Bot"
+                onerror="this.parentElement.innerHTML='🤖'">
+        </div>
+        <h1>KB Bot</h1>
+        <p class="subtitle">Select your designation to access your documents</p>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="designation">Your Designation</label>
+                <select class="designation-select" id="designation" required>
+                    <option value="">Choose your designation...</option>
+                    <!-- Options will be populated dynamically from API -->
+                </select>
+            </div>
+
+            <div class="access-preview" id="accessPreview">
+                <h3>📁 Your Document Access:</h3>
+                <div class="access-list" id="accessList"></div>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">
+                Access Chatbot
+            </button>
+        </form>
+
+        <div class="footer">
+            Secure role-based document access system
+        </div>
+    </div>
+
+    <script>
+        class LoginApp {
+            constructor() {
+                this.accessData = {};
+                this.selectedDesignation = '';
+                this.initializeElements();
+                this.bindEvents();
+                this.loadAccessData();
+            }
+
+            initializeElements() {
+                this.designationSelect = document.getElementById('designation');
+                this.loginBtn = document.getElementById('loginBtn');
+                this.loginForm = document.getElementById('loginForm');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.successMessage = document.getElementById('successMessage');
+                this.accessPreview = document.getElementById('accessPreview');
+                this.accessList = document.getElementById('accessList');
+            }
+
+            bindEvents() {
+                this.loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+                this.designationSelect.addEventListener('change', (e) => this.handleDesignationChange(e));
+            }
+
+            async loadAccessData() {
+                try {
+                    const response = await fetch('/api/access-data');
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        this.accessData = data.access_data;
+                        this.populateDesignationDropdown();
+                    } else {
+                        this.showError('Failed to load access data: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Failed to load access data:', error);
+                    this.showError('Failed to connect to server. Please try again.');
+                }
+            }
+
+            populateDesignationDropdown() {
+                this.designationSelect.innerHTML = '<option value="">Choose your designation...</option>';
+
+                Object.keys(this.accessData).forEach(designation => {
+                    const option = document.createElement('option');
+                    option.value = designation;
+                    option.textContent = this.formatDesignationName(designation);
+                    this.designationSelect.appendChild(option);
+                });
+            }
+
+            formatDesignationName(designation) {
+                return designation
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, str => str.toUpperCase())
+                    .replace(/\b\w/g, l => l.toUpperCase())
+                    .trim();
+            }
+
+            handleDesignationChange(e) {
+                this.selectedDesignation = e.target.value;
+
+                if (this.selectedDesignation && this.accessData[this.selectedDesignation]) {
+                    this.showAccessPreview(this.selectedDesignation);
+                } else {
+                    this.accessPreview.style.display = 'none';
+                }
+            }
+
+            showAccessPreview(designation) {
+                const access = this.accessData[designation];
+                if (!access) return;
+
+                const allowedDocs = Object.keys(access).filter(doc => access[doc] === 1);
+
+                if (allowedDocs.length === 0) {
+                    this.accessList.innerHTML = '<div class="no-access">No document access granted</div>';
+                } else {
+                    this.accessList.innerHTML = allowedDocs
+                        .map(doc => `<div class="access-item">${this.formatDocumentName(doc)}</div>`)
+                        .join('');
+                }
+
+                this.accessPreview.style.display = 'block';
+            }
+
+            formatDocumentName(docName) {
+                return docName
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase())
+                    .trim();
+            }
+
+            async handleLogin(e) {
+                e.preventDefault();
+
+                if (!this.selectedDesignation) {
+                    this.showError('Please select your designation');
+                    return;
+                }
+
+                this.setLoading(true);
+                this.hideMessages();
+
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            designation: this.selectedDesignation
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        this.showSuccess('Login successful! Redirecting to chatbot...');
+
+                        setTimeout(() => {
+                            window.location.href = '/chatbot';
+                        }, 1500);
+                    } else {
+                        this.showError(data.message || 'Login failed');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    this.showError('Connection error. Please try again.');
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            setLoading(isLoading) {
+                if (isLoading) {
+                    this.loginBtn.disabled = true;
+                    this.loginBtn.innerHTML = '<div class="loading"></div>Logging in...';
+                } else {
+                    this.loginBtn.disabled = false;
+                    this.loginBtn.innerHTML = 'Access Chatbot';
+                }
+            }
+
+            showError(message) {
+                this.errorMessage.textContent = message;
+                this.errorMessage.style.display = 'block';
+                this.successMessage.style.display = 'none';
+            }
+
+            showSuccess(message) {
+                this.successMessage.textContent = message;
+                this.successMessage.style.display = 'block';
+                this.errorMessage.style.display = 'none';
+            }
+
+            hideMessages() {
+                this.errorMessage.style.display = 'none';
+                this.successMessage.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.loginApp = new LoginApp();
+        });
+    </script>
+    <script>
+        // --- Embedding Modal Logic ---
+        function openEmbedModal() {
+            document.getElementById('embedModal').style.display = 'flex';
+        }
+
+        function closeEmbedModal() {
+            document.getElementById('embedModal').style.display = 'none';
+            // reset forms
+            document.querySelectorAll('.embed-form').forEach(f => f.style.display = 'none');
+            document.getElementById('embedOptions').style.display = 'flex';
+            document.getElementById('embedStatus').textContent = '';
+            document.getElementById('roleSelectionContainer').style.display = 'none';
+        }
+
+        async function showEmbedForm(type) {
+            document.getElementById('embedOptions').style.display = 'none';
+            document.getElementById('form-' + type).style.display = 'block';
+            document.getElementById('roleSelectionContainer').style.display = 'block';
+            await fetchRoles(); // Initial fetch of roles
+            if (type === 'kbase') {
+                await fetchSpaces();
+            }
+        }
+
+        async function fetchRoles() {
+            const container = document.getElementById('roleList');
+            if (container.children.length > 0) return; // Already loaded
+
+            try {
+                const res = await fetch('/api/roles');
+                const data = await res.json();
+                if (data.success) {
+                    let html = '';
+                    data.roles.forEach(role => {
+                        html += `
+                            <label class="role-checkbox">
+                                <input type="checkbox" name="roles" value="${role}">
+                                <span>${role}</span>
+                            </label>
+                        `;
+                    });
+                    container.innerHTML = html;
+                }
+            } catch (e) {
+                console.error("Failed to fetch roles:", e);
+            }
+        }
+
+        function backToOptions() {
+            document.querySelectorAll('.embed-form').forEach(f => f.style.display = 'none');
+            document.getElementById('embedOptions').style.display = 'flex';
+            document.getElementById('embedStatus').textContent = '';
+            document.getElementById('roleSelectionContainer').style.display = 'none';
+            // Reset kbase selects
+            if (document.getElementById('spaceSelect')) {
+                document.getElementById('spaceSelect').innerHTML = '<option value="">-- Select Space --</option>';
+                document.getElementById('pageSelect').innerHTML = '<option value="">-- Select Page --</option>';
+                document.getElementById('pageSelectRow').style.display = 'none';
+            }
+        }
+
+        async function fetchSpaces() {
+            const spaceSelect = document.getElementById('spaceSelect');
+            spaceSelect.innerHTML = '<option value="">Loading spaces...</option>';
+            try {
+                const res = await fetch('/api/kbase/spaces');
+                const data = await res.json();
+                if (data.success) {
+                    let html = '<option value="">-- Select Space --</option>';
+                    data.spaces.forEach(s => {
+                        html += `<option value="${s.key}">${s.name} (${s.key})</option>`;
+                    });
+                    spaceSelect.innerHTML = html;
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (e) {
+                document.getElementById('embedStatus').textContent = 'Error fetching spaces: ' + e.message;
+                document.getElementById('embedStatus').className = 'status-msg error';
+            }
+        }
+
+        async function fetchPages() {
+            const spaceKey = document.getElementById('spaceSelect').value;
+            const pageSelect = document.getElementById('pageSelect');
+            const pageRow = document.getElementById('pageSelectRow');
+
+            if (!spaceKey) {
+                pageRow.style.display = 'none';
+                return;
+            }
+
+            pageRow.style.display = 'block';
+            pageSelect.innerHTML = '<option value="">Loading pages...</option>';
+
+            try {
+                const res = await fetch(`/api/kbase/pages/${spaceKey}`);
+                const data = await res.json();
+                if (data.success) {
+                    let html = '<option value="">-- Select Page --</option>';
+                    data.pages.forEach(p => {
+                        html += `<option value="${p.id}">${p.title}</option>`;
+                    });
+                    pageSelect.innerHTML = html;
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (e) {
+                document.getElementById('embedStatus').textContent = 'Error fetching pages: ' + e.message;
+                document.getElementById('embedStatus').className = 'status-msg error';
+            }
+        }
+
+        async function submitEmbed(type) {
+            const statusDiv = document.getElementById('embedStatus');
+            statusDiv.textContent = 'Processing... This may take a moment.';
+            statusDiv.className = 'status-msg';
+
+            let url, body;
+
+            try {
+                const selectedRoles = Array.from(document.querySelectorAll('input[name="roles"]:checked')).map(cb => cb.value);
+
+                if (type === 'url') {
+                    const input = document.getElementById('urlInput').value.trim();
+                    if (!input) { throw new Error('Please enter a URL'); }
+                    url = '/api/embed/url';
+                    body = JSON.stringify({ url: input, roles: selectedRoles });
+                }
+                else if (type === 'kbase') {
+                    const pageId = document.getElementById('pageSelect').value;
+                    if (!pageId) { throw new Error('Please select a page'); }
+                    url = '/api/embed/kbase';
+                    body = JSON.stringify({ page_id: pageId, roles: selectedRoles });
+                }
+                else if (type === 'doc') {
+                    const fileInput = document.getElementById('docInput');
+                    if (!fileInput.files[0]) { throw new Error('Please select a file'); }
+                    url = '/api/embed/doc';
+                    const formData = new FormData();
+                    formData.append('file', fileInput.files[0]);
+                    formData.append('roles', JSON.stringify(selectedRoles));
+
+                    const res = await fetch(url, { method: 'POST', body: formData });
+                    const dat = await res.json();
+                    if (dat.success) {
+                        statusDiv.textContent = 'Success! ' + dat.message;
+                        statusDiv.className = 'status-msg success';
+                        // Refresh access data to show new document in preview
+                        if (window.loginApp) { window.loginApp.loadAccessData(); }
+                        setTimeout(closeEmbedModal, 2000);
+                    } else {
+                        throw new Error(dat.message);
+                    }
+                    return;
+                }
+
+                // Initial fetch for JSON bodies
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: body
+                });
+                const dat = await res.json();
+
+                if (dat.success) {
+                    statusDiv.textContent = 'Success! ' + dat.message;
+                    statusDiv.className = 'status-msg success';
+                    // Refresh access data to show new document in preview
+                    if (window.loginApp) { window.loginApp.loadAccessData(); }
+                    setTimeout(closeEmbedModal, 2000);
+                } else {
+                    throw new Error(dat.message);
+                }
+
+            } catch (e) {
+                statusDiv.textContent = 'Error: ' + e.message;
+                statusDiv.className = 'status-msg error';
+            }
+        }
+    </script>
+
+    <!-- Embed Modal HTML -->
+    <div id="embedModal" class="modal-overlay" style="display:none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>Embed Content</h2>
+                <button class="close-btn" onclick="closeEmbedModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="embedStatus" class="status-msg"></div>
+
+                <!-- Step 1: Options -->
+                <div id="embedOptions" class="embed-grid">
+                    <div class="embed-option" onclick="showEmbedForm('url')">
+                        <div class="icon">🌍</div>
+                        <h3>Public URL</h3>
+                        <p>Embed an article from the web</p>
+                    </div>
+                    <div class="embed-option" onclick="showEmbedForm('kbase')">
+                        <div class="icon">📚</div>
+                        <h3>KBase Page</h3>
+                        <p>Embed an internal Confluence page</p>
+                    </div>
+                    <div class="embed-option" onclick="showEmbedForm('doc')">
+                        <div class="icon">📄</div>
+                        <h3>Upload Document</h3>
+                        <p>PDF, PowerPoint, or Doc</p>
+                    </div>
+                </div>
+
+                <!-- Role Selection (Shared) -->
+                <div id="roleSelectionContainer"
+                    style="display:none; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #eee;">
+                    <label
+                        style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; color: #444;">Who
+                        can access this?</label>
+                    <div id="roleList"
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; max-height: 150px; overflow-y: auto; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                        <!-- roles populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Step 2: Forms -->
+                <div id="form-url" class="embed-form" style="display:none;">
+                    <label>Enter Public URL</label>
+                    <input type="text" id="urlInput" placeholder="https://example.com/article">
+                    <div class="form-actions">
+                        <button class="btn-secondary" onclick="backToOptions()">Back</button>
+                        <button class="btn-primary" onclick="submitEmbed('url')">Embed URL</button>
+                    </div>
+                </div>
+
+                <div id="form-kbase" class="embed-form" style="display:none;">
+                    <label>Select Space</label>
+                    <select id="spaceSelect" onchange="fetchPages()"
+                        style="width: 100%; padding: 0.6rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 6px;">
+                        <option value="">-- Select Space --</option>
+                    </select>
+
+                    <div id="pageSelectRow" style="display:none;">
+                        <label>Select Page</label>
+                        <select id="pageSelect"
+                            style="width: 100%; padding: 0.6rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="">-- Select Page --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-secondary" onclick="backToOptions()">Back</button>
+                        <button class="btn-primary" onclick="submitEmbed('kbase')">Embed Page</button>
+                    </div>
+                </div>
+
+                <div id="form-doc" class="embed-form" style="display:none;">
+                    <label>Select Document</label>
+                    <input type="file" id="docInput"
+                        accept=".pdf,.pptx,.docx,.doc,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation">
+                    <div class="form-actions">
+                        <button class="btn-secondary" onclick="backToOptions()">Back</button>
+                        <button class="btn-primary" onclick="submitEmbed('doc')">Upload & Embed</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-container {
+            background: #fff;
+            width: 500px;
+            max-width: 90%;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: left;
+        }
+
+        .modal-header {
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .embed-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .embed-option {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .embed-option:hover {
+            border-color: #07ed41;
+            background: #f0fdf4;
+        }
+
+        .embed-option .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .embed-option h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .embed-option p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .embed-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        .embed-form input {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-primary {
+            background: #07ed41;
+            color: #000;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: #eee;
+            color: #333;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .status-msg {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .status-msg.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-msg.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .role-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+
+        .role-checkbox:hover {
+            background: #f8f9fa;
+        }
+
+        .role-checkbox input {
+            width: auto !important;
+            margin: 0 !important;
+        }
+    </style>
+</body>
+
+</html>
